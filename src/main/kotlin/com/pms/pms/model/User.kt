@@ -34,3 +34,8 @@ data class UserResponse(
     val createdAt: Long = Instant.now().toEpochMilli(),
     val updatedAt: Long = Instant.now().toEpochMilli()
 )
+
+data class LoginInput(
+    val email: String,
+    val password: String
+)

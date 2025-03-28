@@ -8,6 +8,7 @@ import com.pms.pms.service.ProjectService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/projects")
 class ProjectController(private val projectService: ProjectService) {

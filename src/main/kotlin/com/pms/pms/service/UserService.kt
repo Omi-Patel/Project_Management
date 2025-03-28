@@ -1,6 +1,7 @@
 package com.pms.pms.service
 
 
+import com.pms.pms.model.LoginInput
 import com.pms.pms.model.User
 import com.pms.pms.model.UserInput
 import com.pms.pms.model.UserResponse
@@ -14,7 +15,6 @@ class UserService(private val userRepository: UserRepository) {
     val id = UUID.randomUUID().toString()
     val createdAt = System.currentTimeMillis()
     val updatedAt = System.currentTimeMillis()
-
 
 
     fun createUser(request: UserInput): UserResponse {
@@ -31,11 +31,25 @@ class UserService(private val userRepository: UserRepository) {
         return userRepository.save(user).toResponse()
     }
 
+    fun login(request: LoginInput): String {
+        // Find user by email
+        val user = userRepository.findByEmail(request.email) ?: throw RuntimeException("User not found")
+
+        // Validate password using BCrypt
+        if (user.password != request.password) {
+            throw RuntimeException("Invalid credentials")
+        }
+
+        // Generate a simple token (In real case, use JWT or other token mechanism)
+        return "Login successful for user: ${user.id}"
+    }
+
     fun getAllUsers(): List<UserResponse> =
         userRepository.findAll().map { it.toResponse() }
 
     fun getUserById(id: String): UserResponse? =
         userRepository.findById(id)?.toResponse()
+
 
     fun updateUser(user: User): UserResponse? {
         val existingUser = userRepository.findById(user.id) ?: return null

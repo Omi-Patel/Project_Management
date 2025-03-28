@@ -27,6 +27,7 @@ data class ProjectRequest(
 data class ProjectResponse(
     val id: String,
     val name: String,
+    val taskIds: List<String>?,
     val description: String?,
     val startDate: Long?,
     val endDate: Long?,

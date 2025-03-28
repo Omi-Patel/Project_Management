@@ -1,13 +1,13 @@
 package com.pms.pms.controller
 
 
-import com.pms.pms.model.Task
 import com.pms.pms.model.TaskRequest
 import com.pms.pms.model.TaskResponse
 import com.pms.pms.service.TaskService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
+@CrossOrigin
 @RestController
 @RequestMapping("/api/v1/tasks")
 class TaskController(private val taskService: TaskService) {
@@ -49,7 +49,7 @@ class TaskController(private val taskService: TaskService) {
 //    }
 
     // Get tasks assigned to a specific user
-//    @GetMapping("/user/{userId}")
-//    fun getTasksByUserId(@PathVariable userId: String): ResponseEntity<List<TaskResponse>> =
-//        ResponseEntity.ok(taskService.getTasksByUserId(userId))
+    @GetMapping("/{userId}")
+    fun getTasksByUserId(@PathVariable userId: String): ResponseEntity<List<String>> =
+        ResponseEntity.ok(taskService.getTasksByUserId(userId))
 }

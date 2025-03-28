@@ -138,4 +138,9 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
         val sql = "SELECT task_id FROM user_tasks WHERE user_id = ?"
         return jdbcTemplate.queryForList(sql, arrayOf(userId), String::class.java)
     }
+
+    fun findTaskIdsByProjectId(id: String): List<String> {
+        val sql = "SELECT id FROM tasks WHERE project_id = ?"
+        return jdbcTemplate.queryForList(sql, arrayOf(id), String::class.java)
+    }
 }

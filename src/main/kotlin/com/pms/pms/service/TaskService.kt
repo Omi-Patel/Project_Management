@@ -47,8 +47,11 @@ class TaskService(private val taskRepository: TaskRepository) {
 
     // Delete task
     fun deleteTask(id: String) {
-        taskRepository.deleteUserAssignments(id)
         taskRepository.delete(id)
+    }
+
+    fun getTasksByUserId(userId: String): List<String>? {
+        return taskRepository.findTaskIdsByUserId(userId)
     }
 
 //    // Assign users to a task
@@ -58,8 +61,6 @@ class TaskService(private val taskRepository: TaskRepository) {
 //            taskRepository.assignUsersToTask(taskId, userId, System.currentTimeMillis(), updatedAt)
 //        }
 //    }
-
-
 
     // Convert Task to TaskResponse
     private fun Task.toResponse(assigneeIds: List<String>) = TaskResponse(

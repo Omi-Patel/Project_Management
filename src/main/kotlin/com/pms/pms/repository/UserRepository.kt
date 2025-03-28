@@ -55,6 +55,7 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
         }.firstOrNull()
     }
 
+
     fun update(user: User): User {
         val sql = """
             UPDATE users
@@ -73,5 +74,21 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
     fun deleteById(id: String): Int {
         val sql = "DELETE FROM users WHERE id = ?"
         return jdbcTemplate.update(sql, id)
+    }
+
+    fun findByEmail(email: String): User? {
+        val sql = "SELECT * FROM users WHERE email = ?"
+        return jdbcTemplate.query(sql, arrayOf(email)) { rs, _ ->
+            User(
+                id = rs.getString("id"),
+                name = rs.getString("name"),
+                email = rs.getString("email"),
+                password = rs.getString("password"),
+                phoneNumber = rs.getString("phone_number"),
+                status = rs.getString("status"),
+                createdAt = rs.getLong("created_at"),
+                updatedAt = rs.getLong("updated_at")
+            )
+        }.firstOrNull()
     }
 }

@@ -1,6 +1,7 @@
 package com.pms.pms.controller
 
 
+import com.pms.pms.model.LoginInput
 import com.pms.pms.model.User
 import com.pms.pms.model.UserInput
 import com.pms.pms.model.UserResponse
@@ -9,12 +10,19 @@ import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @RestController
+@CrossOrigin
 @RequestMapping("/api/v1/users")
 class UserController(private val userService: UserService) {
 
     @PostMapping("/create")
     fun createUser(@RequestBody request: UserInput): ResponseEntity<UserResponse> =
         ResponseEntity.ok(userService.createUser(request))
+
+    @PostMapping("/login")
+    fun loginUser(@RequestBody request: LoginInput): ResponseEntity<String> {
+
+        return ResponseEntity.ok(userService.login(request))
+    }
 
     @GetMapping("/list")
     fun getAllUsers(): ResponseEntity<List<UserResponse>> =
