@@ -19,9 +19,9 @@ class ProjectController(private val projectService: ProjectService) {
         ResponseEntity.ok(projectService.createProject(projectRequest))
 
     // Get all projects
-    @GetMapping("/list")
-    fun getAllProjects(): ResponseEntity<List<ProjectResponse>> =
-        ResponseEntity.ok(projectService.getAllProjects())
+    @GetMapping("/list/{userId}")
+    fun getAllProjects(@PathVariable userId: String): ResponseEntity<List<ProjectResponse>> =
+        ResponseEntity.ok(projectService.getAllProjects(userId))
 
     // Get project by ID
     @GetMapping("/get/{id}")

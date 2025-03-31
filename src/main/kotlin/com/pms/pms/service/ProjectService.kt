@@ -22,8 +22,8 @@ class ProjectService(private val projectRepository: ProjectRepository, private v
     }
 
     // Get all projects
-    fun getAllProjects(): List<ProjectResponse> {
-        return projectRepository.findAll().map { it.toResponse() }
+    fun getAllProjects(userId: String): List<ProjectResponse> {
+        return projectRepository.findAll(userId).map { it.toResponse() }
     }
 
     // Get project by ID
@@ -74,6 +74,7 @@ class ProjectService(private val projectRepository: ProjectRepository, private v
         name = name,
         taskIds = listOf(),
         description = description,
+        userId = userId,
         startDate = startDate,
         endDate = endDate,
         createdAt = createdAt,

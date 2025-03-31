@@ -13,12 +13,12 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
     // Save a new project and return the saved project using findById
     fun save(projectRequest: ProjectRequest, id: String, createdAt: Long, updatedAt: Long): Project {
         val sql = """
-            INSERT INTO projects (id, name, description, start_date, end_date, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO projects (id, name, description, user_id, start_date, end_date, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
         jdbcTemplate.update(
-            sql, id, projectRequest.name, projectRequest.description, projectRequest.startDate,
+            sql, id, projectRequest.name, projectRequest.description, projectRequest.userId, projectRequest.startDate,
             projectRequest.endDate, createdAt, updatedAt
         )
 
@@ -26,6 +26,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
             id = id,
             name = projectRequest.name,
             description = projectRequest.description,
+            userId = projectRequest.userId,
             startDate = projectRequest.startDate,
             endDate = projectRequest.endDate,
             createdAt = createdAt,
@@ -43,6 +44,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
                 name = rs.getString("name"),
                 taskIds = emptyList(), // Placeholder for now
                 description = rs.getString("description"),
+                userId = rs.getString("user_id"),
                 startDate = rs.getLong("start_date").takeIf { !rs.wasNull() },
                 endDate = rs.getLong("end_date").takeIf { !rs.wasNull() },
                 createdAt = rs.getLong("created_at"),
@@ -62,13 +64,14 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
 
 
     // Find all projects
-    fun findAll(): List<Project> {
-        val sql = "SELECT * FROM projects"
-        return jdbcTemplate.query(sql) { rs, _ ->
+    fun findAll(userId: String): List<Project> {
+        val sql = "SELECT * FROM projects WHERE user_id = ?"
+        return jdbcTemplate.query(sql, arrayOf(userId)) { rs, _ ->
             Project(
                 id = rs.getString("id"),
                 name = rs.getString("name"),
                 description = rs.getString("description"),
+                userId = rs.getString("user_id"),
                 startDate = rs.getLong("start_date"),
                 endDate = rs.getLong("end_date"),
                 createdAt = rs.getLong("created_at"),

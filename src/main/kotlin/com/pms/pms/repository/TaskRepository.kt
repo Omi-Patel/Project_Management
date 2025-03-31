@@ -119,6 +119,12 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
         return task
     }
 
+    fun updateTaskStatus(taskId: String, newStatus: String): String {
+        val sql = "UPDATE tasks SET status = ? WHERE id = ?"
+        jdbcTemplate.update(sql, newStatus, taskId)
+        return "Task Updated Successfully"
+    }
+
     // Delete Task by ID
     fun delete(id: String) {
         // Delete from user_tasks first (foreign key dependency)

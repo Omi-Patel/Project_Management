@@ -34,6 +34,11 @@ class TaskController(private val taskService: TaskService) {
     fun updateTask(@RequestBody taskRequest: TaskResponse): ResponseEntity<TaskResponse> =
         ResponseEntity.ok(taskService.updateTask(taskRequest))
 
+    // Update an existing task
+    @PostMapping("/update-status/{taskId}/{newStatus}")
+    fun updateTaskStatus(@PathVariable taskId: String, @PathVariable newStatus: String): ResponseEntity<String> =
+        ResponseEntity.ok(taskService.updateTaskStatus(taskId, newStatus))
+
     // Delete task by ID
     @DeleteMapping("/delete/{id}")
     fun deleteTask(@PathVariable id: String): ResponseEntity<Void> {

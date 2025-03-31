@@ -45,6 +45,10 @@ class TaskService(private val taskRepository: TaskRepository) {
         return taskRepository.update(taskRequest.id, taskRequest)
     }
 
+    fun updateTaskStatus(taskId: String, newStatus: String): String {
+        return taskRepository.updateTaskStatus(taskId, newStatus)
+    }
+
     // Delete task
     fun deleteTask(id: String) {
         taskRepository.delete(id)
@@ -74,4 +78,6 @@ class TaskService(private val taskRepository: TaskRepository) {
         createdAt = createdAt,
         updatedAt = updatedAt
     )
+
+
 }
