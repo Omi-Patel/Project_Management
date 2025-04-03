@@ -1,8 +1,6 @@
 package com.pms.pms.repository
 
-import com.pms.pms.model.Task
-import com.pms.pms.model.TaskRequest
-import com.pms.pms.model.TaskResponse
+import com.pms.pms.model.*
 import org.springframework.jdbc.core.JdbcTemplate
 import org.springframework.stereotype.Repository
 import java.util.UUID
@@ -81,15 +79,111 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
 
 
     // Find all tasks
-    fun findAll(): List<TaskResponse> {
-        val sql = "SELECT id FROM tasks"
-        val taskIds = jdbcTemplate.queryForList(sql, String::class.java)
+    fun findAll(input: ListTask): List<TaskResponse> {
+        val params = mutableListOf<Any>()
+        val conditions = mutableListOf<String>()
 
-        // Use findById to fetch detailed information and convert to TaskResponse
+        // Base SQL Query
+        val baseSql = """
+        SELECT t.id 
+        FROM tasks t
+        LEFT JOIN user_tasks ut ON t.id = ut.task_id
+    """.trimIndent()
+
+        // Filter by userId (if provided)
+        if (input.userId.isNotBlank()) {
+            conditions.add("ut.user_id = ?")
+            params.add(input.userId)
+        }
+
+        // Search filter
+        if (!input.search.isNullOrBlank()) {
+            conditions.add("(t.title ILIKE ? OR t.description ILIKE ?)")
+            params.add("%${input.search}%")
+            params.add("%${input.search}%")
+        }
+
+        // Pagination
+        val page = input.page ?: 1
+        val size = input.size ?: 10
+        val offset = (page - 1) * size
+
+        // Build final SQL query
+        val sql = buildString {
+            append(baseSql)
+            if (conditions.isNotEmpty()) {
+                append(" WHERE ").append(conditions.joinToString(" AND "))
+            }
+            append(" ORDER BY t.created_at DESC")
+            append(" LIMIT ? OFFSET ?")
+        }
+
+        // Add pagination params
+        params.add(size)
+        params.add(offset)
+
+        // Execute query and get task IDs
+        val taskIds = jdbcTemplate.queryForList(sql, params.toTypedArray(), String::class.java)
+
+        // Fetch full task details
         return taskIds.mapNotNull { taskId ->
             findById(taskId)
         }
     }
+
+    fun findAllByProjectId(input: ListProjectTask): List<TaskResponse> {
+        val params = mutableListOf<Any>()
+        val conditions = mutableListOf<String>()
+
+        // Base SQL Query for filtering tasks by projectId
+        val baseSql = """
+    SELECT t.id 
+    FROM tasks t
+    """.trimIndent()
+
+        // Filter by projectId (if provided)
+        if (!input.projectId.isNullOrBlank()) {
+            conditions.add("t.project_id = ?")
+            params.add(input.projectId)
+        }
+
+        // Search filter (task title or description)
+        if (!input.search.isNullOrBlank()) {
+            conditions.add("(t.title ILIKE ? OR t.description ILIKE ?)")
+            params.add("%${input.search}%")
+            params.add("%${input.search}%")
+        }
+
+        // Pagination
+        val page = input.page ?: 1
+        val size = input.size ?: 10
+        val offset = (page - 1) * size
+
+        // Build final SQL query
+        val sql = buildString {
+            append(baseSql)
+            if (conditions.isNotEmpty()) {
+                append(" WHERE ").append(conditions.joinToString(" AND "))
+            }
+            append(" ORDER BY t.created_at DESC")
+            append(" LIMIT ? OFFSET ?")
+        }
+
+        // Add pagination params
+        params.add(size)
+        params.add(offset)
+
+        // Execute query to fetch task IDs
+        val taskIds = jdbcTemplate.queryForList(sql, params.toTypedArray(), String::class.java)
+
+        // Fetch the tasks for each taskId
+        val tasks = taskIds.mapNotNull { taskId ->
+            findById(taskId)  // Fetch each task details by its ID
+        }
+
+        return tasks
+    }
+
 
     // Find all assignees by Task ID
     fun findAssigneesByTaskId(taskId: String): List<String> {
@@ -98,14 +192,14 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
     }
 
     // Update Task
-    fun update(id: String, task: TaskResponse): TaskResponse {
+    fun update(id: String, task: TaskResponse, updatedAt: Long): TaskResponse {
         val sql = """
             UPDATE tasks SET title = ?, description = ?, status = ?, priority = ?, updated_at = ?
             WHERE id = ?
         """.trimIndent()
 
         jdbcTemplate.update(
-            sql, task.title, task.description, task.status, task.priority, System.currentTimeMillis(), id
+            sql, task.title, task.description, task.status, task.priority, updatedAt, id
         )
 
         // Remove all previous user assignments
@@ -119,9 +213,9 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
         return task
     }
 
-    fun updateTaskStatus(taskId: String, newStatus: String): String {
-        val sql = "UPDATE tasks SET status = ? WHERE id = ?"
-        jdbcTemplate.update(sql, newStatus, taskId)
+    fun updateTaskStatus(taskId: String, newStatus: String, updatedAt: Long): String {
+        val sql = "UPDATE tasks SET status = ?, updated_at = ? WHERE id = ?"
+        jdbcTemplate.update(sql, newStatus, updatedAt, taskId)
         return "Task Updated Successfully"
     }
 

@@ -1,6 +1,8 @@
 package com.pms.pms.controller
 
 
+import com.pms.pms.model.ListProjectTask
+import com.pms.pms.model.ListTask
 import com.pms.pms.model.TaskRequest
 import com.pms.pms.model.TaskResponse
 import com.pms.pms.service.TaskService
@@ -18,9 +20,13 @@ class TaskController(private val taskService: TaskService) {
         ResponseEntity.ok(taskService.createTask(taskRequest))
 
     // Get all tasks
-    @GetMapping("/list")
-    fun getAllTasks(): ResponseEntity<List<TaskResponse>> =
-        ResponseEntity.ok(taskService.getAllTasks())
+    @PostMapping("/list")
+    fun getAllTasks(@RequestBody request: ListTask): ResponseEntity<List<TaskResponse>> =
+        ResponseEntity.ok(taskService.getAllTasks(request))
+
+    @PostMapping("/project/list")
+    fun getAllTasksByProjectId(@RequestBody request: ListProjectTask): ResponseEntity<List<TaskResponse>> =
+        ResponseEntity.ok(taskService.getAllTasksByProjectId(request))
 
     // Get task by ID
     @GetMapping("/get/{id}")

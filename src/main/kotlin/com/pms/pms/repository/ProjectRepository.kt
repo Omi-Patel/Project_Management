@@ -13,12 +13,12 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
     // Save a new project and return the saved project using findById
     fun save(projectRequest: ProjectRequest, id: String, createdAt: Long, updatedAt: Long): Project {
         val sql = """
-            INSERT INTO projects (id, name, description, user_id, start_date, end_date, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO projects (id, name, description, user_id, color, start_date, end_date, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
         jdbcTemplate.update(
-            sql, id, projectRequest.name, projectRequest.description, projectRequest.userId, projectRequest.startDate,
+            sql, id, projectRequest.name, projectRequest.description, projectRequest.userId, projectRequest.color, projectRequest.startDate,
             projectRequest.endDate, createdAt, updatedAt
         )
 
@@ -27,6 +27,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
             name = projectRequest.name,
             description = projectRequest.description,
             userId = projectRequest.userId,
+            color = projectRequest.color,
             startDate = projectRequest.startDate,
             endDate = projectRequest.endDate,
             createdAt = createdAt,
@@ -45,6 +46,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
                 taskIds = emptyList(), // Placeholder for now
                 description = rs.getString("description"),
                 userId = rs.getString("user_id"),
+                color = rs.getString("color"),
                 startDate = rs.getLong("start_date").takeIf { !rs.wasNull() },
                 endDate = rs.getLong("end_date").takeIf { !rs.wasNull() },
                 createdAt = rs.getLong("created_at"),
@@ -72,6 +74,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
                 name = rs.getString("name"),
                 description = rs.getString("description"),
                 userId = rs.getString("user_id"),
+                color = rs.getString("color"),
                 startDate = rs.getLong("start_date"),
                 endDate = rs.getLong("end_date"),
                 createdAt = rs.getLong("created_at"),
@@ -84,12 +87,12 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
     fun update(id: String, project: ProjectResponse) {
         val sql = """
             UPDATE projects 
-            SET name = ?, description = ?, start_date = ?, end_date = ?, updated_at = ?
+            SET name = ?, description = ?, color = ?, start_date = ?, end_date = ?, updated_at = ?
             WHERE id = ?
         """.trimIndent()
 
         jdbcTemplate.update(
-            sql, project.name, project.description, project.startDate,
+            sql, project.name, project.description, project.color, project.startDate,
             project.endDate, project.updatedAt, id
         )
     }

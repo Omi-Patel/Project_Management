@@ -10,7 +10,7 @@ data class User(
     val id: String,
     val name: String,
     val email: String,
-    val password: String,
+    val password: String? = "123456",
     val phoneNumber: String? = null,
     val status: String? = null, // Example: ACTIVE, INACTIVE, PENDING
     val createdAt: Long = Instant.now().toEpochMilli(),

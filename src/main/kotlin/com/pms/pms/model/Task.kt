@@ -43,3 +43,17 @@ data class UserTaskRequest(
     val userId: String,
     val taskId: String
 )
+
+data class ListTask(
+    val userId: String,
+    val search: String?,
+    val page: Int? = 1,
+    val size: Int? = 10
+)
+
+data class ListProjectTask(
+    val projectId: String,
+    val search: String?,
+    val page: Int? = 1,
+    val size: Int? = 10
+)

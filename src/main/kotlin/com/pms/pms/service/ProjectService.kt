@@ -40,6 +40,7 @@ class ProjectService(private val projectRepository: ProjectRepository, private v
         val updatedProject = existingProject.copy(
             name = projectRequest.name,
             description = projectRequest.description,
+            color = projectRequest.color,
             startDate = projectRequest.startDate,
             endDate = projectRequest.endDate,
             updatedAt = updatedAt
@@ -75,6 +76,7 @@ class ProjectService(private val projectRepository: ProjectRepository, private v
         taskIds = listOf(),
         description = description,
         userId = userId,
+        color = color,
         startDate = startDate,
         endDate = endDate,
         createdAt = createdAt,

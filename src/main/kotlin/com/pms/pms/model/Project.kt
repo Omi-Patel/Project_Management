@@ -13,6 +13,7 @@ data class Project(
     val userId: String,
     val startDate: Long?,
     val endDate: Long?,
+    val color: String?,
     val createdAt: Long = Instant.now().toEpochMilli(),
     val updatedAt: Long = Instant.now().toEpochMilli()
 )
@@ -22,6 +23,7 @@ data class ProjectRequest(
     val name: String,
     val description: String?,
     val userId: String,
+    val color: String?,
     val startDate: Long?,
     val endDate: Long?
 )
@@ -32,6 +34,7 @@ data class ProjectResponse(
     val taskIds: List<String>?,
     val description: String?,
     val userId: String,
+    val color: String?,
     val startDate: Long?,
     val endDate: Long?,
     val createdAt: Long,

@@ -1,9 +1,7 @@
 package com.pms.pms.service
 
 
-import com.pms.pms.model.Task
-import com.pms.pms.model.TaskRequest
-import com.pms.pms.model.TaskResponse
+import com.pms.pms.model.*
 import com.pms.pms.repository.TaskRepository
 import org.springframework.stereotype.Service
 import java.util.*
@@ -24,8 +22,14 @@ class TaskService(private val taskRepository: TaskRepository) {
 
 
     // Get all tasks
-    fun getAllTasks(): List<TaskResponse> {
-        val tasks = taskRepository.findAll()
+    fun getAllTasks(request: ListTask): List<TaskResponse> {
+        val tasks = taskRepository.findAll(request)
+        return tasks
+    }
+
+    // Get all tasks of project
+    fun getAllTasksByProjectId(request: ListProjectTask): List<TaskResponse> {
+        val tasks = taskRepository.findAllByProjectId(request)
         return tasks
     }
 
@@ -42,11 +46,12 @@ class TaskService(private val taskRepository: TaskRepository) {
         val updatedAt = System.currentTimeMillis()
 
         // Update task details
-        return taskRepository.update(taskRequest.id, taskRequest)
+        return taskRepository.update(taskRequest.id, taskRequest, updatedAt)
     }
 
     fun updateTaskStatus(taskId: String, newStatus: String): String {
-        return taskRepository.updateTaskStatus(taskId, newStatus)
+        val updatedAt = System.currentTimeMillis()
+        return taskRepository.updateTaskStatus(taskId, newStatus, updatedAt)
     }
 
     // Delete task
