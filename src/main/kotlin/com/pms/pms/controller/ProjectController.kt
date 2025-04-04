@@ -18,10 +18,15 @@ class ProjectController(private val projectService: ProjectService) {
     fun createProject(@RequestBody projectRequest: ProjectRequest): ResponseEntity<ProjectResponse> =
         ResponseEntity.ok(projectService.createProject(projectRequest))
 
-    // Get all projects
+    // Get all projects of user
     @GetMapping("/list/{userId}")
-    fun getAllProjects(@PathVariable userId: String): ResponseEntity<List<ProjectResponse>> =
+    fun getAllProjectsByUserId(@PathVariable userId: String): ResponseEntity<List<ProjectResponse>> =
         ResponseEntity.ok(projectService.getAllProjects(userId))
+
+    // Get all projects
+    @GetMapping("/list")
+    fun getAllProjects(): ResponseEntity<List<ProjectResponse>> =
+        ResponseEntity.ok(projectService.getAllProjects(null))
 
     // Get project by ID
     @GetMapping("/get/{id}")

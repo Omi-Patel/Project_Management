@@ -21,8 +21,8 @@ class ProjectService(private val projectRepository: ProjectRepository, private v
         return projectRepository.save(project, id, createdAt, updatedAt).toResponse()
     }
 
-    // Get all projects
-    fun getAllProjects(userId: String): List<ProjectResponse> {
+    // Get all projects for user
+    fun getAllProjects(userId: String?): List<ProjectResponse> {
         return projectRepository.findAll(userId).map { it.toResponse() }
     }
 

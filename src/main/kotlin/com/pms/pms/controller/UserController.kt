@@ -14,16 +14,6 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/users")
 class UserController(private val userService: UserService) {
 
-    @PostMapping("/create")
-    fun createUser(@RequestBody request: UserInput): ResponseEntity<UserResponse> =
-        ResponseEntity.ok(userService.createUser(request))
-
-    @PostMapping("/login")
-    fun loginUser(@RequestBody request: LoginInput): ResponseEntity<String> {
-
-        return ResponseEntity.ok(userService.login(request))
-    }
-
     @GetMapping("/list")
     fun getAllUsers(): ResponseEntity<List<UserResponse>> =
         ResponseEntity.ok(userService.getAllUsers())

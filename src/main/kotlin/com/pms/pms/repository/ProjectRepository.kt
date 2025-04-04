@@ -66,9 +66,19 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
 
 
     // Find all projects
-    fun findAll(userId: String): List<Project> {
-        val sql = "SELECT * FROM projects WHERE user_id = ?"
-        return jdbcTemplate.query(sql, arrayOf(userId)) { rs, _ ->
+    fun findAll(userId: String?): List<Project> {
+        val sql: String
+        val params: Array<Any?>
+
+        if (userId != null) {
+            sql = "SELECT * FROM projects WHERE user_id = ?"
+            params = arrayOf(userId)
+        } else {
+            sql = "SELECT * FROM projects"
+            params = emptyArray()
+        }
+
+        return jdbcTemplate.query(sql, params) { rs, _ ->
             Project(
                 id = rs.getString("id"),
                 name = rs.getString("name"),
@@ -82,6 +92,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
             )
         }
     }
+
 
     // Update project by ID
     fun update(id: String, project: ProjectResponse) {

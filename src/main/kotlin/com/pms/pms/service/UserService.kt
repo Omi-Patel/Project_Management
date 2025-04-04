@@ -17,33 +17,6 @@ class UserService(private val userRepository: UserRepository) {
     val updatedAt = System.currentTimeMillis()
 
 
-    fun createUser(request: UserInput): UserResponse {
-        val user = User(
-            id = UUID.randomUUID().toString(),
-            name = request.name,
-            email = request.email,
-            password = request.password,
-            phoneNumber = request.phoneNumber,
-            status = request.status ?: "ACTIVE",
-            createdAt = System.currentTimeMillis(),
-            updatedAt = System.currentTimeMillis()
-        )
-        return userRepository.save(user).toResponse()
-    }
-
-    fun login(request: LoginInput): String {
-        // Find user by email
-        val user = userRepository.findByEmail(request.email) ?: throw RuntimeException("User not found")
-
-        // Validate password using BCrypt
-        if (user.password != request.password) {
-            throw RuntimeException("Invalid credentials")
-        }
-
-        // Generate a simple token (In real case, use JWT or other token mechanism)
-        return "Login successful for user: ${user.id}"
-    }
-
     fun getAllUsers(): List<UserResponse> =
         userRepository.findAll().map { it.toResponse() }
 

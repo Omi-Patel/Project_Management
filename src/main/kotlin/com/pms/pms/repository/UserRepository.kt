@@ -9,20 +9,6 @@ import org.springframework.stereotype.Repository
 @Repository
 class UserRepository(private val jdbcTemplate: JdbcTemplate) {
 
-    fun save(user: User): User {
-        val sql = """
-            INSERT INTO users (id, name, email, password, phone_number, status, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        """.trimIndent()
-
-        jdbcTemplate.update(
-            sql, user.id, user.name, user.email, user.password,
-            user.phoneNumber, user.status, user.createdAt, user.updatedAt
-        )
-
-        return findById(user.id) ?: throw RuntimeException("Failed to retrieve saved user.")
-    }
-
     fun findAll(): List<User> {
         val sql = "SELECT * FROM users"
         return jdbcTemplate.query(sql) { rs, _ ->
@@ -30,7 +16,6 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
                 id = rs.getString("id"),
                 name = rs.getString("name"),
                 email = rs.getString("email"),
-                password = rs.getString("password"),
                 phoneNumber = rs.getString("phone_number"),
                 status = rs.getString("status"),
                 createdAt = rs.getLong("created_at"),
@@ -46,7 +31,6 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
                 id = rs.getString("id"),
                 name = rs.getString("name"),
                 email = rs.getString("email"),
-                password = rs.getString("password"),
                 phoneNumber = rs.getString("phone_number"),
                 status = rs.getString("status"),
                 createdAt = rs.getLong("created_at"),
@@ -59,12 +43,12 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
     fun update(user: User): User {
         val sql = """
             UPDATE users
-            SET name = ?, email = ?, password = ?, phone_number = ?, status = ?, updated_at = ?
+            SET name = ?, email = ?, phone_number = ?, status = ?, updated_at = ?
             WHERE id = ?
         """.trimIndent()
 
         jdbcTemplate.update(
-            sql, user.name, user.email, user.password, user.phoneNumber,
+            sql, user.name, user.email, user.phoneNumber,
             user.status, user.updatedAt, user.id
         )
 

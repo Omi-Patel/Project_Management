@@ -12,6 +12,7 @@ data class User(
     val email: String,
     val password: String? = "123456",
     val phoneNumber: String? = null,
+    val role: String? = "EMPLOYEE",
     val status: String? = null, // Example: ACTIVE, INACTIVE, PENDING
     val createdAt: Long = Instant.now().toEpochMilli(),
     val updatedAt: Long = Instant.now().toEpochMilli()
@@ -30,6 +31,7 @@ data class UserResponse(
     val name: String,
     val email: String,
     val phoneNumber: String? = null,
+    val role: String? = "EMPLOYEE",
     val status: String? = null, // Example: ACTIVE, INACTIVE, PENDING
     val createdAt: Long = Instant.now().toEpochMilli(),
     val updatedAt: Long = Instant.now().toEpochMilli()
@@ -38,4 +40,9 @@ data class UserResponse(
 data class LoginInput(
     val email: String,
     val password: String
+)
+
+data class AuthResponse(
+    val accessToken: String,
+    val refreshToken: String
 )
