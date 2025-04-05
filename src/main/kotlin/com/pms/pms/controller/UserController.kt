@@ -1,10 +1,7 @@
 package com.pms.pms.controller
 
 
-import com.pms.pms.model.LoginInput
-import com.pms.pms.model.User
-import com.pms.pms.model.UserInput
-import com.pms.pms.model.UserResponse
+import com.pms.pms.model.*
 import com.pms.pms.service.UserService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
@@ -14,9 +11,9 @@ import org.springframework.web.bind.annotation.*
 @RequestMapping("/api/v1/users")
 class UserController(private val userService: UserService) {
 
-    @GetMapping("/list")
-    fun getAllUsers(): ResponseEntity<List<UserResponse>> =
-        ResponseEntity.ok(userService.getAllUsers())
+    @PostMapping("/list")
+    fun getAllUsers(@RequestBody request: UserListInput): ResponseEntity<List<UserResponse>> =
+        ResponseEntity.ok(userService.getAllUsers(request))
 
     @GetMapping("/get/{id}")
     fun getUserById(@PathVariable id: String): ResponseEntity<UserResponse> =

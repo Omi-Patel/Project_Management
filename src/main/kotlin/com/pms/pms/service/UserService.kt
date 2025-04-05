@@ -1,10 +1,7 @@
 package com.pms.pms.service
 
 
-import com.pms.pms.model.LoginInput
-import com.pms.pms.model.User
-import com.pms.pms.model.UserInput
-import com.pms.pms.model.UserResponse
+import com.pms.pms.model.*
 import com.pms.pms.repository.UserRepository
 import org.springframework.stereotype.Service
 import java.util.UUID
@@ -17,8 +14,9 @@ class UserService(private val userRepository: UserRepository) {
     val updatedAt = System.currentTimeMillis()
 
 
-    fun getAllUsers(): List<UserResponse> =
-        userRepository.findAll().map { it.toResponse() }
+    fun getAllUsers(request: UserListInput): List<UserResponse> {
+        return userRepository.findAll(request)
+    }
 
     fun getUserById(id: String): UserResponse? =
         userRepository.findById(id)?.toResponse()
@@ -31,6 +29,7 @@ class UserService(private val userRepository: UserRepository) {
             email = user.email,
             password = user.password,
             phoneNumber = user.phoneNumber,
+            role = user.role,
             status = user.status ?: existingUser.status,
             createdAt = existingUser.createdAt,
             updatedAt = System.currentTimeMillis()
@@ -45,6 +44,7 @@ class UserService(private val userRepository: UserRepository) {
         name = name,
         email = email,
         phoneNumber = phoneNumber,
+        role = role,
         status = status,
         createdAt = createdAt,
         updatedAt = updatedAt

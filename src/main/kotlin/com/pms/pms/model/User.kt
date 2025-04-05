@@ -46,3 +46,9 @@ data class AuthResponse(
     val accessToken: String,
     val refreshToken: String
 )
+
+data class UserListInput (
+    val search: String?,
+    val page: Int? = 1,
+    val size: Int? = 10
+)
