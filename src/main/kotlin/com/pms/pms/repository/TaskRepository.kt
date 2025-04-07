@@ -91,7 +91,7 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
     """.trimIndent()
 
         // Filter by userId (if provided)
-        if (input.userId.isNotBlank()) {
+        if (input.userId!!.isNotBlank()) {
             conditions.add("ut.user_id = ?")
             params.add(input.userId)
         }

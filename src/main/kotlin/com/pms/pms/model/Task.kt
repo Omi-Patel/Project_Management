@@ -45,7 +45,7 @@ data class UserTaskRequest(
 )
 
 data class ListTask(
-    val userId: String,
+    val userId: String?,
     val search: String?,
     val page: Int? = 1,
     val size: Int? = 10
