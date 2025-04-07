@@ -18,8 +18,16 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
         """.trimIndent()
 
         jdbcTemplate.update(
-            sql, id, projectRequest.name, projectRequest.description, projectRequest.userId, projectRequest.color, projectRequest.startDate,
-            projectRequest.endDate, createdAt, updatedAt
+            sql,
+            id,
+            projectRequest.name,
+            projectRequest.description,
+            projectRequest.userId,
+            projectRequest.color,
+            projectRequest.startDate,
+            projectRequest.endDate,
+            createdAt,
+            updatedAt
         )
 
         return Project(
@@ -71,8 +79,20 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
         val params: Array<Any?>
 
         if (userId != null) {
-            sql = "SELECT * FROM projects WHERE user_id = ?"
-            params = arrayOf(userId)
+            sql = """
+          SELECT DISTINCT p.*
+        FROM projects p
+        JOIN tasks t ON t.project_id = p.id
+        JOIN user_tasks ut ON ut.task_id = t.id
+        WHERE ut.user_id = ?
+        
+        UNION
+        
+        SELECT *
+        FROM projects p
+        WHERE p.user_id = ?
+    """.trimIndent()
+            params = arrayOf(userId, userId)
         } else {
             sql = "SELECT * FROM projects"
             params = emptyArray()

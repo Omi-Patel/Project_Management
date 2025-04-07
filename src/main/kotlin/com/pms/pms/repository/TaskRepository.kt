@@ -83,7 +83,6 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
         val params = mutableListOf<Any>()
         val conditions = mutableListOf<String>()
 
-        // Base SQL Query
         val baseSql = """
         SELECT t.id 
         FROM tasks t
@@ -91,16 +90,37 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
     """.trimIndent()
 
         // Filter by userId (if provided)
-        if (input.userId!!.isNotBlank()) {
+        input.userId?.takeIf { it.isNotBlank() }?.let {
             conditions.add("ut.user_id = ?")
-            params.add(input.userId)
+            params.add(it)
         }
 
         // Search filter
-        if (!input.search.isNullOrBlank()) {
+        input.search?.takeIf { it.isNotBlank() }?.let {
             conditions.add("(t.title ILIKE ? OR t.description ILIKE ?)")
-            params.add("%${input.search}%")
-            params.add("%${input.search}%")
+            params.add("%$it%")
+            params.add("%$it%")
+        }
+
+        // Filter by status
+        input.statuses?.takeIf { it.isNotEmpty() }?.let {
+            val placeholders = it.joinToString(",") { "?" }
+            conditions.add("t.status IN ($placeholders)")
+            params.addAll(it)
+        }
+
+        // Filter by priority
+        input.priorities?.takeIf { it.isNotEmpty() }?.let {
+            val placeholders = it.joinToString(",") { "?" }
+            conditions.add("t.priority IN ($placeholders)")
+            params.addAll(it)
+        }
+
+        // Filter by assigneeIds
+        input.assigneeIds?.takeIf { it.isNotEmpty() }?.let {
+            val placeholders = it.joinToString(",") { "?" }
+            conditions.add("ut.user_id IN ($placeholders)")
+            params.addAll(it)
         }
 
         // Pagination
@@ -108,28 +128,27 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
         val size = input.size ?: 10
         val offset = (page - 1) * size
 
-        // Build final SQL query
+        // Final SQL with GROUP BY to avoid DISTINCT + ORDER BY error
         val sql = buildString {
             append(baseSql)
             if (conditions.isNotEmpty()) {
                 append(" WHERE ").append(conditions.joinToString(" AND "))
             }
-            append(" ORDER BY t.created_at DESC")
+            append(" GROUP BY t.id")
+            append(" ORDER BY MAX(t.created_at) DESC")
             append(" LIMIT ? OFFSET ?")
         }
 
-        // Add pagination params
         params.add(size)
         params.add(offset)
 
-        // Execute query and get task IDs
+        // Execute and map
         val taskIds = jdbcTemplate.queryForList(sql, params.toTypedArray(), String::class.java)
 
-        // Fetch full task details
-        return taskIds.mapNotNull { taskId ->
-            findById(taskId)
-        }
+        return taskIds.mapNotNull { findById(it) }
     }
+
+
 
     fun findAllByProjectId(input: ListProjectTask): List<TaskResponse> {
         val params = mutableListOf<Any>()

@@ -48,7 +48,10 @@ data class ListTask(
     val userId: String?,
     val search: String?,
     val page: Int? = 1,
-    val size: Int? = 10
+    val size: Int? = 10,
+    val statuses: List<String>?,
+    val priorities: List<String>?,
+    val assigneeIds: List<String>?
 )
 
 data class ListProjectTask(
