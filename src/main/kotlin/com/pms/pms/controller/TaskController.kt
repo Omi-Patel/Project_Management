@@ -37,7 +37,7 @@ class TaskController(private val taskService: TaskService) {
 
     // Update an existing task
     @PostMapping("/update")
-    fun updateTask(@RequestBody taskRequest: TaskResponse): ResponseEntity<TaskResponse> =
+    fun updateTask(@RequestBody taskRequest: TaskResponse): ResponseEntity<TaskResponse?> =
         ResponseEntity.ok(taskService.updateTask(taskRequest))
 
     // Update an existing task

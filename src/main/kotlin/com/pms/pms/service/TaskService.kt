@@ -40,7 +40,7 @@ class TaskService(private val taskRepository: TaskRepository) {
     }
 
     // Update task
-    fun updateTask(taskRequest: TaskResponse): TaskResponse {
+    fun updateTask(taskRequest: TaskResponse): TaskResponse? {
         val existingTask = taskRepository.findById(taskRequest.id) ?: throw RuntimeException("Task not found")
 
         val updatedAt = System.currentTimeMillis()
@@ -71,18 +71,7 @@ class TaskService(private val taskRepository: TaskRepository) {
 //        }
 //    }
 
-    // Convert Task to TaskResponse
-    private fun Task.toResponse(assigneeIds: List<String>) = TaskResponse(
-        id = id,
-        projectId = projectId,
-        title = title,
-        description = description,
-        assigneeIds = assigneeIds,
-        status = status,
-        priority = priority,
-        createdAt = createdAt,
-        updatedAt = updatedAt
-    )
+
 
 
 }

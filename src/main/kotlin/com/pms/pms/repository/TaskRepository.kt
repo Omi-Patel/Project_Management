@@ -45,8 +45,9 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
 
     // Find task by ID
     fun findById(id: String): TaskResponse? {
-        val sql = "SELECT * FROM tasks WHERE id = ?"
-        val task = jdbcTemplate.query(sql, arrayOf(id)) { rs, _ ->
+        // Fetch the task
+        val taskSql = "SELECT * FROM tasks WHERE id = ?"
+        val task = jdbcTemplate.query(taskSql, arrayOf(id)) { rs, _ ->
             Task(
                 id = rs.getString("id"),
                 projectId = rs.getString("project_id"),
@@ -59,14 +60,30 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
             )
         }.firstOrNull() ?: return null
 
-        // Fetch assignees from user_tasks
+        // Fetch the project
+        val projectSql = "SELECT * FROM projects WHERE id = ?"
+        val project = jdbcTemplate.query(projectSql, arrayOf(task.projectId)) { rs, _ ->
+            Project(
+                id = rs.getString("id"),
+                name = rs.getString("name"),
+                description = rs.getString("description"),
+                startDate = rs.getLong("start_date"),
+                endDate = rs.getLong("end_date"),
+                createdAt = rs.getLong("created_at"),
+                updatedAt = rs.getLong("updated_at"),
+                userId = rs.getString("user_id"),
+                color = rs.getString("color")
+            )
+        }.firstOrNull() ?: return null
+
+        // Fetch assignees
         val assigneeSql = "SELECT user_id FROM user_tasks WHERE task_id = ?"
         val assigneeIds = jdbcTemplate.queryForList(assigneeSql, arrayOf(id), String::class.java)
 
         // Convert to TaskResponse
         return TaskResponse(
             id = task.id,
-            projectId = task.projectId,
+            project = project,
             title = task.title,
             description = task.description,
             assigneeIds = assigneeIds,
@@ -76,6 +93,7 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
             updatedAt = task.updatedAt
         )
     }
+
 
 
     // Find all tasks
@@ -211,7 +229,7 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
     }
 
     // Update Task
-    fun update(id: String, task: TaskResponse, updatedAt: Long): TaskResponse {
+    fun update(id: String, task: TaskResponse, updatedAt: Long): TaskResponse? {
         val sql = """
             UPDATE tasks SET title = ?, description = ?, status = ?, priority = ?, updated_at = ?
             WHERE id = ?
@@ -229,7 +247,7 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
             assignUsersToTask(id, task.assigneeIds, task.createdAt, task.updatedAt)
         }
 
-        return task
+        return findById(task.id)
     }
 
     fun updateTaskStatus(taskId: String, newStatus: String, updatedAt: Long): String {

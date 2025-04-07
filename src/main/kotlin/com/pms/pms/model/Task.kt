@@ -29,7 +29,7 @@ data class TaskRequest(
 
 data class TaskResponse(
     val id: String,
-    val projectId: String,
+    val project: Project?,
     val title: String,
     val description: String?,
     val assigneeIds: List<String>,
