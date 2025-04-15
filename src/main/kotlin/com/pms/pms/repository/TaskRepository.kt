@@ -14,13 +14,13 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
 
         // Insert task into the tasks table
         val taskSql = """
-            INSERT INTO tasks (id, project_id, title, description, status, priority, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO tasks (id, project_id, title, description, status, priority, due_date, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
         jdbcTemplate.update(
             taskSql, id, taskRequest.projectId, taskRequest.title, taskRequest.description,
-            taskRequest.status, taskRequest.priority, createdAt, updatedAt
+            taskRequest.status, taskRequest.priority, taskRequest.dueDate, createdAt, updatedAt
         )
 
         // Assign the task to multiple users
@@ -55,6 +55,7 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
                 description = rs.getString("description"),
                 status = rs.getString("status"),
                 priority = rs.getString("priority"),
+                dueDate = rs.getLong("due_date"),
                 createdAt = rs.getLong("created_at"),
                 updatedAt = rs.getLong("updated_at")
             )
@@ -89,6 +90,7 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
             assigneeIds = assigneeIds,
             status = task.status,
             priority = task.priority,
+            dueDate = task.dueDate,
             createdAt = task.createdAt,
             updatedAt = task.updatedAt
         )
@@ -231,12 +233,12 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
     // Update Task
     fun update(id: String, task: TaskResponse, updatedAt: Long): TaskResponse? {
         val sql = """
-            UPDATE tasks SET title = ?, description = ?, status = ?, priority = ?, updated_at = ?
+            UPDATE tasks SET title = ?, description = ?, status = ?, priority = ?, due_date = ?, updated_at = ?
             WHERE id = ?
         """.trimIndent()
 
         jdbcTemplate.update(
-            sql, task.title, task.description, task.status, task.priority, updatedAt, id
+            sql, task.title, task.description, task.status, task.priority, task.dueDate, updatedAt, id
         )
 
         // Remove all previous user assignments

@@ -13,6 +13,7 @@ data class Task(
     val description: String?,
     val status: String = "TO_DO",
     val priority: String = "MEDIUM",
+    val dueDate: Long?,
     val createdAt: Long = Instant.now().toEpochMilli(),
     val updatedAt: Long = Instant.now().toEpochMilli()
 )
@@ -24,7 +25,8 @@ data class TaskRequest(
     val description: String?,
     val assigneeIds: List<String>,
     val status: String = "TO_DO",
-    val priority: String = "MEDIUM"
+    val priority: String = "MEDIUM",
+    val dueDate: Long?
 )
 
 data class TaskResponse(
@@ -35,6 +37,7 @@ data class TaskResponse(
     val assigneeIds: List<String>,
     val status: String,
     val priority: String,
+    val dueDate: Long?,
     val createdAt: Long,
     val updatedAt: Long
 )
