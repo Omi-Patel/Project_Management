@@ -68,12 +68,13 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
                 id = rs.getString("id"),
                 name = rs.getString("name"),
                 description = rs.getString("description"),
+                workspaceId = rs.getString("workspace_id"),
                 startDate = rs.getLong("start_date"),
                 endDate = rs.getLong("end_date"),
                 createdAt = rs.getLong("created_at"),
                 updatedAt = rs.getLong("updated_at"),
                 userId = rs.getString("user_id"),
-                color = rs.getString("color")
+                color = rs.getString("color"),
             )
         }.firstOrNull() ?: return null
 

@@ -13,8 +13,8 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
     // Save a new project and return the saved project using findById
     fun save(projectRequest: ProjectRequest, id: String, createdAt: Long, updatedAt: Long): Project {
         val sql = """
-            INSERT INTO projects (id, name, description, user_id, color, start_date, end_date, created_at, updated_at) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO projects (id, name, description, user_id, workspace_id, color, start_date, end_date, created_at, updated_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         """.trimIndent()
 
         jdbcTemplate.update(
@@ -23,6 +23,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
             projectRequest.name,
             projectRequest.description,
             projectRequest.userId,
+            projectRequest.workspaceId,
             projectRequest.color,
             projectRequest.startDate,
             projectRequest.endDate,
@@ -35,6 +36,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
             name = projectRequest.name,
             description = projectRequest.description,
             userId = projectRequest.userId,
+            workspaceId = projectRequest.workspaceId,
             color = projectRequest.color,
             startDate = projectRequest.startDate,
             endDate = projectRequest.endDate,
@@ -54,6 +56,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
                 taskIds = emptyList(), // Placeholder for now
                 description = rs.getString("description"),
                 userId = rs.getString("user_id"),
+                workspaceId = rs.getString("workspace_id"),
                 color = rs.getString("color"),
                 startDate = rs.getLong("start_date").takeIf { !rs.wasNull() },
                 endDate = rs.getLong("end_date").takeIf { !rs.wasNull() },
@@ -104,6 +107,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
                 name = rs.getString("name"),
                 description = rs.getString("description"),
                 userId = rs.getString("user_id"),
+                workspaceId = rs.getString("workspace_id"),
                 color = rs.getString("color"),
                 startDate = rs.getLong("start_date"),
                 endDate = rs.getLong("end_date"),
@@ -130,13 +134,35 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
 
     // Delete a project by ID
     fun delete(id: String) {
-        val taskSql = "DELETE FROM tasks WHERE project_id = ?"
+        try {
+            // First delete all related records in the correct order to maintain referential integrity
+            
+            // 1. Delete all user-task assignments for tasks in this project
+            val deleteUserTasksSql = """
+                DELETE FROM user_tasks 
+                WHERE task_id IN (
+                    SELECT id FROM tasks WHERE project_id = ?
+                )
+            """.trimIndent()
+            jdbcTemplate.update(deleteUserTasksSql, id)
+            
+            // 2. Delete all tasks in this project
+            val deleteTasksSql = "DELETE FROM tasks WHERE project_id = ?"
+            jdbcTemplate.update(deleteTasksSql, id)
+            
+            // 3. Finally delete the project
+            val sql = "DELETE FROM projects WHERE id = ?"
+            val rowsAffected = jdbcTemplate.update(sql, id)
 
-        val sql = "DELETE FROM projects WHERE id = ?"
-        val rowsAffected = jdbcTemplate.update(sql, id)
-
-        if (rowsAffected == 0) {
-            throw RuntimeException("No project found with ID: $id")
+            if (rowsAffected == 0) {
+                throw RuntimeException("No project found with ID: $id")
+            }
+        } catch (e: RuntimeException) {
+            throw e
+        } catch (e: Exception) {
+            println("Database constraint error during project deletion: ${e.message}")
+            e.printStackTrace()
+            throw RuntimeException("Failed to delete project due to database constraints: ${e.message}")
         }
     }
 }

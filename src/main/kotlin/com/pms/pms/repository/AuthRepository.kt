@@ -22,8 +22,8 @@ class AuthRepository(private val jdbcTemplate: JdbcTemplate) {
 
         // Save user data
         val userSql = """
-        INSERT INTO users (id, name, phone_number, email, role, status, created_at, updated_at) 
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO users (id, name, phone_number, email, role, status, email_verified, created_at, updated_at) 
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
     """.trimIndent()
         jdbcTemplate.update(
             userSql,
@@ -32,7 +32,8 @@ class AuthRepository(private val jdbcTemplate: JdbcTemplate) {
             phoneNumber,
             email,
             role,
-            "ACTIVE",
+            "PENDING",
+            false,
             currentTime,
             currentTime
         )
@@ -105,6 +106,7 @@ class AuthRepository(private val jdbcTemplate: JdbcTemplate) {
                     email = rs.getString("email"),
                     role = rs.getString("role"), // Fetch roles separately
                     status = rs.getString("status"),
+                    emailVerified = rs.getBoolean("email_verified"),
                     createdAt = rs.getLong("created_at"),
                     updatedAt = rs.getLong("updated_at")
                 )
@@ -120,6 +122,12 @@ class AuthRepository(private val jdbcTemplate: JdbcTemplate) {
     fun updateUserStatus(id: String, status: String): Int {
         val sql = "UPDATE users SET status=? WHERE id=?"
         return jdbcTemplate.update(sql, status, id)
+    }
+
+    // Update user verification status
+    fun updateUserVerificationStatus(userId: String, status: String, emailVerified: Boolean): Int {
+        val sql = "UPDATE users SET status=?, email_verified=?, updated_at=? WHERE id=?"
+        return jdbcTemplate.update(sql, status, emailVerified, System.currentTimeMillis(), userId)
     }
 
 }

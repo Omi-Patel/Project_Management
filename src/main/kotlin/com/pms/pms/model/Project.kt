@@ -11,6 +11,7 @@ data class Project(
     val name: String,
     val description: String?,
     val userId: String,
+    val workspaceId: String?,
     val startDate: Long?,
     val endDate: Long?,
     val color: String?,
@@ -23,6 +24,7 @@ data class ProjectRequest(
     val name: String,
     val description: String?,
     val userId: String,
+    val workspaceId: String?,
     val color: String?,
     val startDate: Long?,
     val endDate: Long?
@@ -34,6 +36,7 @@ data class ProjectResponse(
     val taskIds: List<String>?,
     val description: String?,
     val userId: String,
+    val workspaceId: String?,
     val color: String?,
     val startDate: Long?,
     val endDate: Long?,

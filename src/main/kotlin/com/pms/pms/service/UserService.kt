@@ -46,6 +46,7 @@ class UserService(private val userRepository: UserRepository) {
         phoneNumber = phoneNumber,
         role = role,
         status = status,
+        emailVerified = emailVerified,
         createdAt = createdAt,
         updatedAt = updatedAt
     )

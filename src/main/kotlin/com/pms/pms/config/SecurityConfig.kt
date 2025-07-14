@@ -67,7 +67,7 @@ class SecurityConfig(
 //                it.requestMatchers(
 //                    "/api/v1/users/create/**", "/api/v1/users/update/**"
 //                ).hasRole("ADMIN") // Restrict this to ADMIN only
-                it.requestMatchers("/api/v1/users/**", "/api/v1/projects/**", "/api/v1/tasks/**").permitAll()
+                it.requestMatchers("/api/v1/users/**", "/api/v1/projects/**", "/api/v1/tasks/**", "/api/v1/task-comments/**", "/api/workspaces/**").permitAll()
                 it.anyRequest().authenticated()
             }
             .authenticationProvider(authenticationProvider())

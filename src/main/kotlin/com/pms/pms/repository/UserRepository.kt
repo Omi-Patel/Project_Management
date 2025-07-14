@@ -15,7 +15,7 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
         val conditions = mutableListOf<String>()
 
         val baseSql = """
-        SELECT id, name, email, phone_number, role, status, created_at, updated_at
+        SELECT id, name, email, phone_number, role, status, email_verified, created_at, updated_at
         FROM users
     """.trimIndent()
 
@@ -55,6 +55,7 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
                 phoneNumber = rs.getString("phone_number"),
                 role = rs.getString("role"),
                 status = rs.getString("status"),
+                emailVerified = rs.getBoolean("email_verified"),
                 createdAt = rs.getLong("created_at"),
                 updatedAt = rs.getLong("updated_at")
             )
@@ -72,6 +73,7 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
                 phoneNumber = rs.getString("phone_number"),
                 role = rs.getString("role"),
                 status = rs.getString("status"),
+                emailVerified = rs.getBoolean("email_verified"),
                 createdAt = rs.getLong("created_at"),
                 updatedAt = rs.getLong("updated_at")
             )
@@ -106,9 +108,11 @@ class UserRepository(private val jdbcTemplate: JdbcTemplate) {
                 id = rs.getString("id"),
                 name = rs.getString("name"),
                 email = rs.getString("email"),
-                password = rs.getString("password"),
+//                password = rs.getString("password"),
                 phoneNumber = rs.getString("phone_number"),
                 status = rs.getString("status"),
+                role = rs.getString("role"),
+                emailVerified = rs.getBoolean("email_verified"),
                 createdAt = rs.getLong("created_at"),
                 updatedAt = rs.getLong("updated_at")
             )

@@ -7,6 +7,7 @@ import com.pms.pms.model.ProjectResponse
 import com.pms.pms.repository.ProjectRepository
 import com.pms.pms.repository.TaskRepository
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 import java.util.UUID
 
 @Service
@@ -50,22 +51,12 @@ class ProjectService(private val projectRepository: ProjectRepository, private v
     }
 
     // Delete a project by ID
+    @Transactional
     fun deleteProject(id: String) {
         // Check if the project exists
         val project = projectRepository.findById(id) ?: throw RuntimeException("Project not found")
 
-        // Get task IDs associated with the project
-        val taskIds = taskRepository.findTaskIdsByProjectId(id)
-
-        if (taskIds.isNotEmpty()) {
-            // Delete from user_tasks using task IDs
-            taskIds.forEach { taskId ->
-                // Delete from user_tasks using task ID
-                taskRepository.delete(taskId)
-            }
-        }
-
-        // Finally, delete the project
+        // Delete the project (this will cascade delete all related tasks and user assignments)
         projectRepository.delete(id)
     }
 
@@ -75,6 +66,7 @@ class ProjectService(private val projectRepository: ProjectRepository, private v
         name = name,
         taskIds = listOf(),
         description = description,
+        workspaceId = workspaceId,
         userId = userId,
         color = color,
         startDate = startDate,

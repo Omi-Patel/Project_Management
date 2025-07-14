@@ -13,7 +13,8 @@ data class User(
     val password: String? = "123456",
     val phoneNumber: String? = null,
     val role: String? = "EMPLOYEE",
-    val status: String? = null, // Example: ACTIVE, INACTIVE, PENDING
+    val status: String? = null, // Example: ACTIVE, INACTIVE, PENDING, VERIFIED
+    val emailVerified: Boolean,
     val createdAt: Long = Instant.now().toEpochMilli(),
     val updatedAt: Long = Instant.now().toEpochMilli()
 )
@@ -23,7 +24,7 @@ data class UserInput(
     val email: String,
     val password: String,
     val phoneNumber: String? = null,
-    val status: String? = "ACTIVE" // Default status set to ACTIVE
+    val status: String? = "PENDING" // Default status set to PENDING for email verification
 )
 
 data class UserResponse(
@@ -32,7 +33,8 @@ data class UserResponse(
     val email: String,
     val phoneNumber: String? = null,
     val role: String? = "EMPLOYEE",
-    val status: String? = null, // Example: ACTIVE, INACTIVE, PENDING
+    val status: String? = null, // Example: ACTIVE, INACTIVE, PENDING, VERIFIED
+    val emailVerified: Boolean,
     val createdAt: Long = Instant.now().toEpochMilli(),
     val updatedAt: Long = Instant.now().toEpochMilli()
 )
