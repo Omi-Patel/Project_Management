@@ -4,19 +4,63 @@ package com.pms.pms.controller
 import com.pms.pms.model.Project
 import com.pms.pms.model.ProjectRequest
 import com.pms.pms.model.ProjectResponse
+import com.pms.pms.model.TaskRequest
 import com.pms.pms.service.ProjectService
+import com.pms.pms.service.TaskService
+import com.pms.pms.service.AITaskGeneratorService
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.*
 
 @CrossOrigin
 @RestController
 @RequestMapping("/api/v1/projects")
-class ProjectController(private val projectService: ProjectService) {
+class ProjectController(
+    private val projectService: ProjectService,
+    private val taskService: TaskService,
+    private val aiTaskGeneratorService: AITaskGeneratorService
+) {
 
     // Create a new project
     @PostMapping("/create")
     fun createProject(@RequestBody projectRequest: ProjectRequest): ResponseEntity<ProjectResponse> =
         ResponseEntity.ok(projectService.createProject(projectRequest))
+
+    // Generate AI tasks for existing project
+    @PostMapping("/generate-ai-tasks/{projectId}")
+    fun generateAITasksForExistingProject(@PathVariable projectId: String): ResponseEntity<Map<String, Any>> {
+        val project = projectService.getProjectById(projectId)
+            ?: return ResponseEntity.notFound().build()
+        
+        // Generate AI tasks for the project
+        val generatedTasks = aiTaskGeneratorService.generateTasksForProject(
+            project.name,
+            project.description
+        )
+        
+        // Create actual tasks in the database with proper ordering
+        val baseTimestamp = System.currentTimeMillis()
+        val createdTasks = generatedTasks.mapIndexed { index, aiTask ->
+            val taskRequest = TaskRequest(
+                projectId = projectId,
+                title = aiTask.title,
+                description = aiTask.description,
+                assigneeIds = listOf(), // No assignees initially
+                status = "TO_DO",
+                priority = aiTask.priority,
+                dueDate = aiTask.estimatedDays?.let { days ->
+                    baseTimestamp + (days * 24 * 60 * 60 * 1000L)
+                }
+            )
+            // Create task with incremented timestamp to ensure proper ordering
+            taskService.createTaskWithTimestamp(taskRequest, baseTimestamp + index)
+        }
+        
+        return ResponseEntity.ok(mapOf(
+            "project" to project,
+            "generatedTasks" to createdTasks,
+            "message" to "Generated ${createdTasks.size} AI tasks for project: ${project.name}"
+        ))
+    }
 
     // Get all projects of user
     @GetMapping("/list/{userId}")

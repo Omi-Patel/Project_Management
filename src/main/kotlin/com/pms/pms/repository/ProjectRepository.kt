@@ -66,7 +66,7 @@ class ProjectRepository(private val jdbcTemplate: JdbcTemplate) {
         }.firstOrNull() ?: return null
 
         // Second query to fetch task IDs
-        val taskSql = "SELECT id FROM tasks WHERE project_id = ?"
+        val taskSql = "SELECT id FROM tasks WHERE project_id = ? ORDER BY created_at ASC"
         val taskIds = jdbcTemplate.query(taskSql, arrayOf(id)) { rs, _ ->
             rs.getString("id")
         }

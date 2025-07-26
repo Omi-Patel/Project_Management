@@ -156,7 +156,7 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
                 append(" WHERE ").append(conditions.joinToString(" AND "))
             }
             append(" GROUP BY t.id")
-            append(" ORDER BY MAX(t.created_at) DESC")
+            append(" ORDER BY MAX(t.created_at) ASC")
             append(" LIMIT ? OFFSET ?")
         }
 
@@ -205,7 +205,7 @@ class TaskRepository(private val jdbcTemplate: JdbcTemplate) {
             if (conditions.isNotEmpty()) {
                 append(" WHERE ").append(conditions.joinToString(" AND "))
             }
-            append(" ORDER BY t.created_at DESC")
+            append(" ORDER BY t.created_at ASC")
             append(" LIMIT ? OFFSET ?")
         }
 

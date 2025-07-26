@@ -20,6 +20,15 @@ class TaskService(private val taskRepository: TaskRepository) {
         return savedTask
     }
 
+    fun createTaskWithTimestamp(task: TaskRequest, timestamp: Long): TaskResponse {
+        val id = UUID.randomUUID().toString()
+        val createdAt = timestamp
+        val updatedAt = timestamp
+        // Save task and assign users with specific timestamp
+        val savedTask = taskRepository.save(task, id, createdAt, updatedAt)
+        return savedTask
+    }
+
 
     // Get all tasks
     fun getAllTasks(request: ListTask): List<TaskResponse> {
