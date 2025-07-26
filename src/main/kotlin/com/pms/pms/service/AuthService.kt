@@ -32,6 +32,12 @@ class AuthService(
 
     fun register(request: UserInput): UserResponse {
 
+        val existingUser = authRepository.findUserAuthByUsername(request.email)
+
+        if (existingUser != null) {
+            throw RuntimeException("User with this email already exists")
+        }
+
         val userId = UUID.randomUUID().toString()
 
         val createdUser = authRepository.saveUserWithAuth(
