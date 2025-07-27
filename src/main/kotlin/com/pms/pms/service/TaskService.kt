@@ -25,7 +25,7 @@ class TaskService(private val taskRepository: TaskRepository) {
         val createdAt = timestamp
         val updatedAt = timestamp
         // Save task and assign users with specific timestamp
-        val savedTask = taskRepository.save(task, id, createdAt, updatedAt)
+        val savedTask: TaskResponse = taskRepository.save(task, id, createdAt, updatedAt)
         return savedTask
     }
 

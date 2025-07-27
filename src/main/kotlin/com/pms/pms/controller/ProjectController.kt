@@ -1,10 +1,7 @@
 package com.pms.pms.controller
 
 
-import com.pms.pms.model.Project
-import com.pms.pms.model.ProjectRequest
-import com.pms.pms.model.ProjectResponse
-import com.pms.pms.model.TaskRequest
+import com.pms.pms.model.*
 import com.pms.pms.service.ProjectService
 import com.pms.pms.service.TaskService
 import com.pms.pms.service.AITaskGeneratorService
@@ -25,7 +22,24 @@ class ProjectController(
     fun createProject(@RequestBody projectRequest: ProjectRequest): ResponseEntity<ProjectResponse> =
         ResponseEntity.ok(projectService.createProject(projectRequest))
 
-    // Generate AI tasks for existing project
+    // Enhanced AI task generation with preferences
+    @PostMapping("/generate-ai-tasks")
+    fun generateAITasks(@RequestBody request: AITaskGenerationRequest): ResponseEntity<AITaskGenerationResponse> {
+        return try {
+            val response = aiTaskGeneratorService.generateIntelligentTasks(request)
+            ResponseEntity.ok(response)
+        } catch (e: Exception) {
+            ResponseEntity.badRequest().body(
+                AITaskGenerationResponse(
+                    success = false,
+                    message = "Failed to generate AI tasks: ${e.message}",
+                    generatedTasks = emptyList()
+                )
+            )
+        }
+    }
+
+    // Legacy endpoint for backward compatibility
     @PostMapping("/generate-ai-tasks/{projectId}")
     fun generateAITasksForExistingProject(@PathVariable projectId: String): ResponseEntity<Map<String, Any>> {
         val project = projectService.getProjectById(projectId)
